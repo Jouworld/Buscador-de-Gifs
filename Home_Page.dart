@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -25,14 +26,15 @@ class _HomePageState extends State<HomePage> {
 
   }
 
+
   @override
-  void initState(){
+  /*void initState(){
     super.initState();
 
     getGifs().then((map){
       print(map);
     });
-  }
+  }*/
   
 
 
@@ -54,11 +56,34 @@ class _HomePageState extends State<HomePage> {
                   labelText: "Pesquisar",
                   labelStyle: TextStyle(color: Colors.black),
                   border: OutlineInputBorder()
-
               ),
             ),
-          )
+          ),
+          Expanded( // Criando e chamando o layout estrutural da aplicação
+            child: FutureBuilder(
+              future: getGifs(),
+              builder: (context, snapshot){
+                switch(snapshot.connectionState){
+                  case ConnectionState.waiting: // caso a conexão esteja em aguardo
+                  case ConnectionState.none: // caso a conexão esteja sem resposta
+                    return Container( // criamos um progresso circular
+                      width: 200,
+                      height: 200,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        strokeWidth: 5.0,
+                      ),
+                    );
+                    default:
+                  if(snapshot.hasError) return Container();
+                  else return _createGifTable(context, snapshot);
 
+                }
+              },
+
+            ),
+          )
 
         ],
 
@@ -66,6 +91,27 @@ class _HomePageState extends State<HomePage> {
 
     );
   }
+
+   Widget _createGifTable(BuildContext context, AsyncSnapshot snapshot){
+    
+    return GridView.builder(
+        padding: EdgeInsets.all(10.0) ,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 10.0,
+          mainAxisSpacing: 10.0
+        ),
+        itemCount: 20,
+        itemBuilder: (context, index){
+          return GestureDetector(
+            child: Image.network(snapshot.data["data"][index]["images"]["fixed_height"]["url"], height: 300.0, fit: BoxFit.cover,),
+
+          );
+        }
+    );
+
+  }
+
 
 
 }
