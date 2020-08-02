@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+
+
+
+class Gif_Page extends StatelessWidget {
+
+  final Map _gifData; // declarando mapa
+
+  Gif_Page(this._gifData);
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(_gifData["title"]),
+        centerTitle: true,
+        backgroundColor: Colors.black,
+      ),
+      backgroundColor: Color(0xffA9A9A9),
+      body: Center(
+        child: Image.network(_gifData["images"]["fixed_height"]["url"]),
+      ),
+    );
+  }
+}
+
