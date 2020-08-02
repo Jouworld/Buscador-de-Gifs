@@ -1,3 +1,4 @@
+import 'package:buscadordegifs/gif_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +19,7 @@ class _HomePageState extends State<HomePage> {
 
     http.Response response;
     if(_search == null || _search.isEmpty){
-      response = await http.get("https://api.giphy.com/v1/gifs/trending?api_key=xATYOrCizB00aq7uJdfcNLZsI1VphRAp&limit=29&rating=g");
+      response = await http.get("https://api.giphy.com/v1/gifs/trending?api_key=xATYOrCizB00aq7uJdfcNLZsI1VphRAp&limit=30&rating=g");
     } else
       response = await http.get("https://api.giphy.com/v1/gifs/search?api_key=xATYOrCizB00aq7uJdfcNLZsI1VphRAp&q=$_search&limit=29&offset=$_offset&rating=g&lang=en");
 
@@ -30,12 +31,11 @@ class _HomePageState extends State<HomePage> {
   @override
   /*void initState(){
     super.initState();
-
     getGifs().then((map){
       print(map);
     });
   }*/
-  
+
 
 
   @override
@@ -83,9 +83,9 @@ class _HomePageState extends State<HomePage> {
                         strokeWidth: 5.0,
                       ),
                     );
-                    default:
-                  if(snapshot.hasError) return Container();
-                  else return _createGifTable(context, snapshot);
+                  default:
+                    if(snapshot.hasError) return Container();
+                    else return _createGifTable(context, snapshot);
 
                 }
               },
@@ -102,53 +102,58 @@ class _HomePageState extends State<HomePage> {
 
   int _getCount(List data){
 
-    if(getGifs()==null){ //caso a não haja busca, seja igual a nulo
+    if(_search==null){ // se meu _search for igual a nulo
       return data.length; // retornar apenas o tamanho real da serie de gifs(tamanho dos dados), não tem espaço no final
     } else {
       return
-         data.length +1; // caso esteja retorna com + 1 espaço
+        data.length +1; // caso esteja retorna com + 1 espaço
 
     }
 
 
   }
 
-   Widget _createGifTable(BuildContext context, AsyncSnapshot snapshot){
-    
+  Widget _createGifTable(BuildContext context, AsyncSnapshot snapshot){
+
     return GridView.builder(
         padding: EdgeInsets.all(10.0) ,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 10.0,
-          mainAxisSpacing: 10.0
+            crossAxisCount: 2,
+            crossAxisSpacing: 10.0,
+            mainAxisSpacing: 10.0
         ),
         itemCount: _getCount(snapshot.data["data"]),
         itemBuilder: (context, index){
           if( _search == null || index < snapshot.data["data"].length)
-          return GestureDetector(
-            child: Image.network(snapshot.data["data"][index]["images"]["fixed_height"]["url"], height: 300.0, fit: BoxFit.cover,),
-          );
+            return GestureDetector(
+              child: Image.network(snapshot.data["data"][index]["images"]["fixed_height"]["url"], height: 300.0, fit: BoxFit.cover,),
+            onTap: (){
+                Navigator.push(context,
+                MaterialPageRoute(builder: (context) => Gif_Page(snapshot.data["data"][index]))
+                );//chamando a próxima tela passando o contexto e passando ao dado ao ser exibido
+            },
+            );
           else
             return
-                Container(
-                  child: GestureDetector(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Icon(Icons.add, color: Colors.white, size: 70.0,),
-                        Text("Carregar mais",
+              Container(
+                child: GestureDetector(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Icon(Icons.add, color: Colors.white, size: 70.0,),
+                      Text("Carregar mais",
                         style: TextStyle(color: Colors.white, fontSize: 22.0),
-                        )
-                      ],
-                    ),
-                    onTap: (){
-                      setState(() {
-                        _offset +=19;
-
-                      });
-                    },
+                      )
+                    ],
                   ),
-                );
+                  onTap: (){
+                    setState(() {
+                      _offset +=19;
+
+                    });
+                  },
+                ),
+              );
         }
     );
 
