@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:share/share.dart';
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -132,6 +134,9 @@ class _HomePageState extends State<HomePage> {
                 MaterialPageRoute(builder: (context) => Gif_Page(snapshot.data["data"][index]))
                 );//chamando a próxima tela passando o contexto e passando ao dado ao ser exibido
             },
+              onLongPress: (){
+                Share.share(snapshot.data["data"][index]["images"]["fixed_height"]["url"]);
+              },
             );
           else
             return
